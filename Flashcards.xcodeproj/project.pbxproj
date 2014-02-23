@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		06C1168DADB8478185A013B2 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C4E13241AC44DDFA80D6631 /* libPods.a */; };
 		FB06CB4018B9642200B4B261 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB06CB3F18B9642200B4B261 /* Foundation.framework */; };
 		FB06CB4218B9642200B4B261 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB06CB4118B9642200B4B261 /* CoreGraphics.framework */; };
 		FB06CB4418B9642200B4B261 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB06CB4318B9642200B4B261 /* UIKit.framework */; };
@@ -26,6 +27,7 @@
 		FB06CB6D18B9642200B4B261 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB06CB4518B9642200B4B261 /* CoreData.framework */; };
 		FB06CB7518B9642200B4B261 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FB06CB7318B9642200B4B261 /* InfoPlist.strings */; };
 		FB06CB7718B9642200B4B261 /* FlashcardsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB06CB7618B9642200B4B261 /* FlashcardsTests.m */; };
+		FBEE4BEE18B96FF60050C2BD /* Flashcard.m in Sources */ = {isa = PBXBuildFile; fileRef = FBEE4BED18B96FF60050C2BD /* Flashcard.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +41,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2C4E13241AC44DDFA80D6631 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		443A7682FB5B4980B36DDED1 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 		FB06CB3C18B9642200B4B261 /* Flashcards.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flashcards.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB06CB3F18B9642200B4B261 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		FB06CB4118B9642200B4B261 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -63,6 +67,8 @@
 		FB06CB7218B9642200B4B261 /* FlashcardsTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FlashcardsTests-Info.plist"; sourceTree = "<group>"; };
 		FB06CB7418B9642200B4B261 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		FB06CB7618B9642200B4B261 /* FlashcardsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FlashcardsTests.m; sourceTree = "<group>"; };
+		FBEE4BEC18B96FF60050C2BD /* Flashcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flashcard.h; sourceTree = "<group>"; };
+		FBEE4BED18B96FF60050C2BD /* Flashcard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Flashcard.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +80,7 @@
 				FB06CB4618B9642200B4B261 /* CoreData.framework in Frameworks */,
 				FB06CB4418B9642200B4B261 /* UIKit.framework in Frameworks */,
 				FB06CB4018B9642200B4B261 /* Foundation.framework in Frameworks */,
+				06C1168DADB8478185A013B2 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,6 +105,7 @@
 				FB06CB7018B9642200B4B261 /* FlashcardsTests */,
 				FB06CB3E18B9642200B4B261 /* Frameworks */,
 				FB06CB3D18B9642200B4B261 /* Products */,
+				443A7682FB5B4980B36DDED1 /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -118,6 +126,7 @@
 				FB06CB4318B9642200B4B261 /* UIKit.framework */,
 				FB06CB4518B9642200B4B261 /* CoreData.framework */,
 				FB06CB6918B9642200B4B261 /* XCTest.framework */,
+				2C4E13241AC44DDFA80D6631 /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -125,6 +134,7 @@
 		FB06CB4718B9642200B4B261 /* Flashcards */ = {
 			isa = PBXGroup;
 			children = (
+				FBEE4BEF18B96FFF0050C2BD /* Model */,
 				FB06CB5018B9642200B4B261 /* FlashcardsAppDelegate.h */,
 				FB06CB5118B9642200B4B261 /* FlashcardsAppDelegate.m */,
 				FB06CB5318B9642200B4B261 /* Main_iPhone.storyboard */,
@@ -169,6 +179,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		FBEE4BEF18B96FFF0050C2BD /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				FBEE4BEC18B96FF60050C2BD /* Flashcard.h */,
+				FBEE4BED18B96FF60050C2BD /* Flashcard.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -176,9 +195,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FB06CB7A18B9642200B4B261 /* Build configuration list for PBXNativeTarget "Flashcards" */;
 			buildPhases = (
+				DE791CF6141F45BEB83DF9A2 /* Check Pods Manifest.lock */,
 				FB06CB3818B9642200B4B261 /* Sources */,
 				FB06CB3918B9642200B4B261 /* Frameworks */,
 				FB06CB3A18B9642200B4B261 /* Resources */,
+				D588A09CB3D240AEB7AEC39A /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -263,6 +284,39 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		D588A09CB3D240AEB7AEC39A /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DE791CF6141F45BEB83DF9A2 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		FB06CB3818B9642200B4B261 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -270,6 +324,7 @@
 			files = (
 				FB06CB4E18B9642200B4B261 /* main.m in Sources */,
 				FB06CB5B18B9642200B4B261 /* Flashcards.xcdatamodeld in Sources */,
+				FBEE4BEE18B96FF60050C2BD /* Flashcard.m in Sources */,
 				FB06CB6118B9642200B4B261 /* FlashcardsDetailViewController.m in Sources */,
 				FB06CB5E18B9642200B4B261 /* FlashcardsMasterViewController.m in Sources */,
 				FB06CB5218B9642200B4B261 /* FlashcardsAppDelegate.m in Sources */,
@@ -406,6 +461,7 @@
 		};
 		FB06CB7B18B9642200B4B261 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 443A7682FB5B4980B36DDED1 /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -419,6 +475,7 @@
 		};
 		FB06CB7C18B9642200B4B261 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 443A7682FB5B4980B36DDED1 /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -491,6 +548,7 @@
 				FB06CB7C18B9642200B4B261 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FB06CB7D18B9642200B4B261 /* Build configuration list for PBXNativeTarget "FlashcardsTests" */ = {
 			isa = XCConfigurationList;
@@ -499,6 +557,7 @@
 				FB06CB7F18B9642200B4B261 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
