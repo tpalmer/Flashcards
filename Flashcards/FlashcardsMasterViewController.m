@@ -9,6 +9,7 @@
 #import "FlashcardsMasterViewController.h"
 #import "FlashcardsDetailViewController.h"
 #import <AFNetworking.h>
+#import "Flashcard.h"
 
 static NSString *const BaseURLString = @"http://respondto.it/";
 
@@ -31,13 +32,13 @@ static NSString *const BaseURLString = @"http://respondto.it/";
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-//    self.navigationItem.leftBarButtonItem = self.editButtonItem;
-
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshObjects)];
     UIBarButtonItem *clearButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(clearObjects)];
     self.navigationItem.rightBarButtonItem = addButton;
     self.navigationItem.leftBarButtonItem = clearButton;
     self.detailViewController = (FlashcardsDetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+    
+    self.flashcards = [Flashcard MR_findAll];
 }
 
 - (void)didReceiveMemoryWarning
@@ -46,35 +47,22 @@ static NSString *const BaseURLString = @"http://respondto.it/";
     // Dispose of any resources that can be recreated.
 }
 
-- (void)insertNewObject:(NSDictionary *)object
+- (void)persistNewFlashcardWithName:(NSString *)name question:(NSString *)question
 {
-    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-    NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
-    NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    // Get the local context
+    NSManagedObjectContext *localContext    = [NSManagedObjectContext MR_contextForCurrentThread];
     
-    // If appropriate, configure the new managed object.
-    // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
-    NSArray *allKeys = [object allKeys];
-    for (NSString *key in allKeys) {
-        id value = [object objectForKey: key];
-        
-        [newManagedObject setValue:value forKey:key];
-    }
+    // Create a new Person in the current thread context
+    Flashcard *flashcard = [Flashcard MR_createInContext:localContext];
+    flashcard.name = name;
+    flashcard.question = question;
     
-    // Save the context.
-    NSError *error = nil;
-    if (![context save:&error]) {
-         // Replace this implementation with code to handle the error appropriately.
-         // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
-    }
+    // Save the modification in the local context
+    // With MagicalRecords 2.0.8 or newer you should use the MR_saveNestedContexts
+    [localContext MR_saveToPersistentStoreAndWait];
 }
 
 - (void)refreshObjects {
-    
-//    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-//    NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
     
     NSString *string = [NSString stringWithFormat:@"%@flashcardstest.json", BaseURLString];
     NSURL *url = [NSURL URLWithString:string];
@@ -87,17 +75,15 @@ static NSString *const BaseURLString = @"http://respondto.it/";
         
         NSLog(@"Response: %@", responseObject);
         
-        // Sort by name, and fast enumerate across response.
-//        NSMutableArray *allKeys = [[responseObject allKeys] mutableCopy];
-//        [allKeys sortedArrayUsingSelector:@selector(name)];
         for (id object in responseObject) {
-//            id object = [responseObject objectForKey: key];
             
-            [self insertNewObject:object];
+            [self persistNewFlashcardWithName:[object objectForKey:@"name"]
+                                     question:[object objectForKey:@"question"]];
         }
         
-//        self.weather = (NSDictionary *)responseObject;
         self.title = @"JSON Retrieved";
+        self.flashcards = [Flashcard MR_findAll];
+        [self.flashcards sortedArrayUsingSelector:@selector(name)];
         [self.tableView reloadData];
         
         
@@ -116,44 +102,26 @@ static NSString *const BaseURLString = @"http://respondto.it/";
 
 -(void)clearObjects {
     
-    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
+    // Get the local context
+    NSManagedObjectContext *localContext    = [NSManagedObjectContext MR_contextForCurrentThread];
     
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Flashcard" inManagedObjectContext:context];
-    [fetchRequest setEntity:entity];
+    [Flashcard MR_truncateAll];
+    [localContext MR_saveToPersistentStoreAndWait];
     
-    NSError *fetchError = nil;
-    NSArray *items = [context executeFetchRequest:fetchRequest error:&fetchError];
-    
-    for (NSManagedObject *managedObject in items) {
-        [context deleteObject:managedObject];
-        NSLog(@"%@ Object deleted.", managedObject);
-    }
-    if (![context save:&fetchError]) {
-    	NSLog(@"Unresolved error %@, %@", fetchError, [fetchError userInfo]);
-        abort();
-    }
-    
-    NSError *error = nil;
-    if (![context save:&error]) {
-        // Replace this implementation with code to handle the error appropriately.
-        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
-    }
+    self.flashcards = [Flashcard MR_findAll];
+    [self.tableView reloadData];
 }
 
 #pragma mark - Table View
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return [[self.fetchedResultsController sections] count];
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    id <NSFetchedResultsSectionInfo> sectionInfo = [self.fetchedResultsController sections][section];
-    return [sectionInfo numberOfObjects];
+    return [self.flashcards count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -161,28 +129,6 @@ static NSString *const BaseURLString = @"http://respondto.it/";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
     [self configureCell:cell atIndexPath:indexPath];
     return cell;
-}
-
-//- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    // Return NO if you do not want the specified item to be editable.
-//    return YES;
-//}
-
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-        [context deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
-        
-        NSError *error = nil;
-        if (![context save:&error]) {
-             // Replace this implementation with code to handle the error appropriately.
-             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
-            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-            abort();
-        }
-    }   
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
@@ -194,8 +140,8 @@ static NSString *const BaseURLString = @"http://respondto.it/";
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        NSManagedObject *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-        self.detailViewController.detailItem = object;
+        Flashcard *flashcard = [self.flashcards objectAtIndex:indexPath.row];
+        self.detailViewController.detailItem = flashcard;
     }
 }
 
@@ -203,114 +149,20 @@ static NSString *const BaseURLString = @"http://respondto.it/";
 {
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        NSManagedObject *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-        [[segue destinationViewController] setDetailItem:object];
+        Flashcard *flashcard = [self.flashcards objectAtIndex:indexPath.row];
+        [[segue destinationViewController] setDetailItem:flashcard];
     }
 }
-
-#pragma mark - Fetched results controller
-
-- (NSFetchedResultsController *)fetchedResultsController
-{
-    if (_fetchedResultsController != nil) {
-        return _fetchedResultsController;
-    }
-    
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Flashcard" inManagedObjectContext:self.managedObjectContext];
-    [fetchRequest setEntity:entity];
-    
-    // Set the batch size to a suitable number.
-    [fetchRequest setFetchBatchSize:20];
-    
-    // Edit the sort key as appropriate.
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"name" ascending:NO];
-    NSArray *sortDescriptors = @[sortDescriptor];
-    
-    [fetchRequest setSortDescriptors:sortDescriptors];
-    
-    // Edit the section name key path and cache name if appropriate.
-    // nil for section name key path means "no sections".
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Master"];
-    aFetchedResultsController.delegate = self;
-    self.fetchedResultsController = aFetchedResultsController;
-    
-	NSError *error = nil;
-	if (![self.fetchedResultsController performFetch:&error]) {
-	     // Replace this implementation with code to handle the error appropriately.
-	     // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
-	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-	    abort();
-	}
-    
-    return _fetchedResultsController;
-}    
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller
 {
     [self.tableView beginUpdates];
 }
 
-- (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
-           atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type
-{
-    switch(type) {
-        case NSFetchedResultsChangeInsert:
-            [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
-            break;
-            
-        case NSFetchedResultsChangeDelete:
-            [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
-            break;
-    }
-}
-
-- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject
-       atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
-      newIndexPath:(NSIndexPath *)newIndexPath
-{
-    UITableView *tableView = self.tableView;
-    
-    switch(type) {
-        case NSFetchedResultsChangeInsert:
-            [tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-            break;
-            
-        case NSFetchedResultsChangeDelete:
-            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            break;
-            
-        case NSFetchedResultsChangeUpdate:
-            [self configureCell:[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
-            break;
-            
-        case NSFetchedResultsChangeMove:
-            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            [tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-            break;
-    }
-}
-
-- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
-{
-    [self.tableView endUpdates];
-}
-
-/*
-// Implementing the above methods to update the table view in response to individual changes may have performance implications if a large number of changes are made simultaneously. If this proves to be an issue, you can instead just implement controllerDidChangeContent: which notifies the delegate that all section and object changes have been processed. 
- 
- - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
-{
-    // In the simplest, most efficient, case, reload the table view.
-    [self.tableView reloadData];
-}
- */
-
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
-    NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    cell.textLabel.text = [[object valueForKey:@"name"] description];
+    Flashcard *flashcard = [self.flashcards objectAtIndex:indexPath.row];
+    cell.textLabel.text = [[flashcard valueForKey:@"name"] description];
 }
 
 @end
